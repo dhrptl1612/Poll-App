@@ -2,7 +2,21 @@
 
 QuickPoll is an interactive polling application that allows users to create polls, vote on options, and view real-time results. The application uses Server-Sent Events (SSE) for real-time updates and provides a responsive user interface.
 
-![QuickPoll Logo](frontend/og/fallback.png)
+
+## Deployment Information
+
+This application is currently deployed and accessible at:
+
+- **Frontend**: [https://poll-app-puce-delta.vercel.app](https://poll-app-puce-delta.vercel.app)
+- **Backend**: Deployed on Render.com
+
+## Live Demo
+
+To try out the application:
+1. Visit the [QuickPoll App](https://poll-app-puce-delta.vercel.app)
+2. Create a poll with your custom question and options
+3. Share the generated link or QR code with others to collect votes
+4. Watch results update in real-time as votes are cast
 
 ## Features
 
@@ -12,9 +26,12 @@ QuickPoll is an interactive polling application that allows users to create poll
 - **Vote Protection**: Fingerprinting mechanism to prevent duplicate votes
 - **Results Privacy**: Option to hide results until a user votes
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Insights**: Automatic analysis of poll results
-- **QR Code Generation**: Generate QR codes for sharing polls
-- **URL Sharing**: Easily share polls via unique URLs
+- **Insights**: Automatic analysis of poll results based on voting patterns
+- **QR Code Generation**: Generate QR codes for easy poll sharing on mobile
+- **URL Sharing**: Easily share polls via unique, shareable URLs
+- **Poll Duration Setting**: Set custom expiration time for polls
+- **Open Graph Support**: Rich previews when sharing polls on social media
+- **Cross-Platform Compatibility**: Works on all modern browsers and devices
 
 ## Technology Stack
 
@@ -72,12 +89,18 @@ quickpoll/
 
 #### Backend Setup
 
-1. Navigate to the backend directory:
+1. Clone this repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-folder>
+   ```
+
+2. Navigate to the backend directory:
    ```bash
    cd backend
    ```
 
-2. Create and activate a virtual environment (optional but recommended):
+3. Create and activate a virtual environment (optional but recommended):
    ```bash
    # On Windows
    python -m venv venv
@@ -88,17 +111,28 @@ quickpoll/
    source venv/bin/activate
    ```
 
-3. Install the required dependencies:
+4. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Create a `.env` file (use `.env.example` as a template):
+5. Create a `.env` file (use `.env.example` as a template):
    ```bash
    cp .env.example .env
    ```
+   
+   Ensure it contains the following settings:
+   ```
+   CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+   DATABASE_URL=sqlite:///./polls.db
+   ```
 
-5. Run the backend server:
+6. Initialize the database and seed initial data (if needed):
+   ```bash
+   python seed.py
+   ```
+
+7. Run the backend server:
    ```bash
    uvicorn main:app --reload
    ```
@@ -107,7 +141,7 @@ quickpoll/
 
 #### Frontend Setup
 
-1. Navigate to the frontend directory:
+1. Navigate to the frontend directory (from the project root):
    ```bash
    cd frontend
    ```
@@ -121,6 +155,11 @@ quickpoll/
    ```bash
    cp .env.example .env
    ```
+   
+   Ensure it contains:
+   ```
+   VITE_API_URL=http://localhost:8000/api
+   ```
 
 4. Start the development server:
    ```bash
@@ -128,6 +167,8 @@ quickpoll/
    ```
 
    The frontend will be available at `http://localhost:5173`.
+   
+5. Open your browser and navigate to `http://localhost:5173` to use the application locally.
 
 ## API Endpoints
 
@@ -180,51 +221,57 @@ quickpoll/
 
 ## Deployment
 
-### Backend Deployment (with Vercel)
+### Current Deployment
 
-1. Install Vercel CLI (if not already installed):
-   ```bash
-   npm install -g vercel
-   ```
+The application is currently deployed at:
 
-2. Create a `vercel.json` file in the backend directory:
+- **Frontend**: [https://poll-app-puce-delta.vercel.app](https://poll-app-puce-delta.vercel.app)
+- **Backend**: Hosted on Render.com
+
+### Deployment Instructions
+
+#### Backend Deployment (with Render.com)
+
+1. Create a new Web Service on Render.com.
+
+2. Connect your GitHub repository.
+
+3. Configure the service:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - **Environment Variables**:
+     - `CORS_ORIGINS`: Your frontend URL (e.g., `https://poll-app-puce-delta.vercel.app`)
+     - Set any other environment variables defined in `.env.example`
+
+4. Deploy the service.
+
+#### Frontend Deployment (with Vercel)
+
+1. Create a `vercel.json` file in the frontend directory (already added):
    ```json
    {
-     "version": 2,
-     "builds": [
-       {
-         "src": "main.py",
-         "use": "@vercel/python"
-       }
-     ],
      "routes": [
        {
-         "src": "/(.*)",
-         "dest": "main.py"
+         "src": "/[^.]+",
+         "dest": "/",
+         "status": 200
        }
      ]
    }
    ```
 
-3. Deploy to Vercel:
-   ```bash
-   cd backend
-   vercel
-   ```
+2. Connect your repository to Vercel.
 
-### Frontend Deployment (with Vercel)
+3. Configure the deployment:
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Environment Variables**:
+     - `VITE_API_URL`: Your backend API URL
 
-1. Build the frontend:
-   ```bash
-   cd frontend
-   npm install
-   npm run build
-   ```
+4. Deploy the project.
 
-2. Deploy to Vercel:
-   ```bash
-   vercel
-   ```
+5. Ensure all routes are properly handled by adding the `vercel.json` configuration (this is crucial for client-side routing to work correctly).
 
 ## Environment Configuration
 
@@ -249,22 +296,20 @@ quickpoll/
 - Verify that `CORS_ORIGINS` in backend/.env includes your frontend URL
 - Check browser console for CORS errors
 
+#### 404 Not Found on Shareable Links
+- Ensure the `vercel.json` file exists in the frontend directory with the correct configuration for client-side routing
+- After making changes to the configuration, redeploy the frontend application
+- Check that the route matches exactly what's defined in your React Router setup
+
 #### Real-time updates not working
 - Check browser console for SSE connection errors
-- Verify that your hosting provider supports Server-Sent Events
+- Verify that your hosting provider supports Server-Sent Events (Render.com does support this)
 - Check that the backend server doesn't terminate long-running connections
 - Make sure the API URLs are properly formed with the correct base URL
 
 #### Database connection issues
 - Verify that the backend has write permissions in its deployment environment
 - Consider using an external database service instead of SQLite for production
-
-## Development Workflow
-
-1. Create feature branches from `main`
-2. Make changes and test locally
-3. Submit pull requests for review
-4. Merge approved PRs to `main`
 
 ## License
 
