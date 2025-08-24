@@ -22,7 +22,7 @@ app = FastAPI(root_path="/api")
 # Allow frontend origins
 # Get allowed origins from environment variable or use defaults
 # Set CORS_ORIGINS env var as comma-separated list: "https://example.com,https://app.example.com"
-origins = ["https://poll-app-puce-delta.vercel.app","http://localhost:5173", "http://127.0.0.1:5173"]
+origins = ["https://poll-app-puce-delta.vercel.app","https://poll-app-wbyj.onrender.com","http://localhost:5173", "http://127.0.0.1:5173"]
 
 
 print(f"Allowed CORS origins: {origins}")
